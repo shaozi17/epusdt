@@ -2,6 +2,10 @@ package service
 
 import (
 	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/dao"
 	"github.com/assimon/luuu/model/data"
@@ -15,9 +19,6 @@ import (
 	"github.com/golang-module/carbon/v2"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
-	"math/rand"
-	"sync"
-	"time"
 )
 
 const (
@@ -55,7 +56,12 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 		return nil, constant.OrderAlreadyExists
 	}
 	// 有无可用钱包
-	walletAddress, err := data.GetAvailableWalletAddress()
+	var walletAddress []mdb.WalletAddress
+	if req.WalletToken == "" {
+		walletAddress, err = data.GetAvailableWalletAddress()
+	} else {
+		walletAddress, err = data.GetSpecialWalletAddress(req.WalletToken)
+	}
 	if err != nil {
 		return nil, err
 	}

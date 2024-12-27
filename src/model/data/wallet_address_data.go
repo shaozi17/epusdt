@@ -64,6 +64,20 @@ func GetPendingWalletAddress() ([]mdb.WalletAddress, error) {
 	return WalletAddressList, err
 }
 
+// GetSpecialWalletAddress 获得指定钱包地址
+func GetSpecialWalletAddress(walletToken string) (WalletAddressList []mdb.WalletAddress, err error) {
+	if walletToken == "" {
+		return GetAvailableWalletAddress()
+	}
+
+	err = dao.Mdb.Model(WalletAddressList).
+		Where("token = ?", walletToken).
+		Where("status = ?", mdb.TokenStatusEnable).
+		Find(&WalletAddressList).
+		Error
+	return WalletAddressList, err
+}
+
 // GetAllWalletAddress 获得所有钱包地址
 func GetAllWalletAddress() ([]mdb.WalletAddress, error) {
 	var WalletAddressList []mdb.WalletAddress

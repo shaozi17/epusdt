@@ -9,6 +9,7 @@ type CreateTransactionRequest struct {
 	NotifyUrl   string  `json:"notify_url" validate:"required"`
 	Signature   string  `json:"signature"  validate:"required"`
 	RedirectUrl string  `json:"redirect_url"`
+	WalletToken string  `json:"wallet_token"`
 }
 
 func (r CreateTransactionRequest) Translates() map[string]string {
