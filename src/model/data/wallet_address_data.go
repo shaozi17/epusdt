@@ -50,6 +50,20 @@ func GetAvailableWalletAddress() ([]mdb.WalletAddress, error) {
 	return WalletAddressList, err
 }
 
+// GetPendingWalletAddress 获得订单正在进行中的钱包地址
+func GetPendingWalletAddress() ([]mdb.WalletAddress, error) {
+	var WalletAddressList []mdb.WalletAddress
+
+	ordersTable := (&mdb.Orders{}).TableName()
+	walletAddressTable := (&mdb.WalletAddress{}).TableName()
+
+	err := dao.Mdb.Model(WalletAddressList).
+		Where("EXISTS (SELECT 1 FROM "+ordersTable+" WHERE "+ordersTable+".token = "+walletAddressTable+".token AND "+ordersTable+".status = ?)", mdb.StatusWaitPay).
+		Where("status = ?", mdb.TokenStatusEnable).
+		Find(&WalletAddressList).Error
+	return WalletAddressList, err
+}
+
 // GetAllWalletAddress 获得所有钱包地址
 func GetAllWalletAddress() ([]mdb.WalletAddress, error) {
 	var WalletAddressList []mdb.WalletAddress
