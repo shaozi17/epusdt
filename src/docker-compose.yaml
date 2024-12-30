@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  epusdt:
+    container_name: "epusdt"
+    image: "epusdt:1.0.0"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      TZ: "Asia/Shanghai"
+    ports:
+      - 8422:8422
+    volumes:
+      - ./runtime:/app/runtime
+      - ./.env:/app/.env
+    networks:
+      - epusdt
+
+networks:
+  # 定义网络
+  epusdt:
+    name: 1panel-network
+    external: true
