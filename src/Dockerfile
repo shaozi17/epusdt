@@ -14,6 +14,7 @@ ADD go.mod .
 ADD go.sum .
 RUN go mod download
 COPY . .
+COPY ./static /app/static
 RUN go build -ldflags="-s -w" -o /app/epusdt main.go
 
 
@@ -24,6 +25,7 @@ COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/S
 ENV TZ Asia/Shanghai
 
 WORKDIR /app
+COPY --from=builder /app/static /app/static
 COPY --from=builder /app/epusdt /app/epusdt
 
 CMD ["./epusdt", "http", "start"]
