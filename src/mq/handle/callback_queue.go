@@ -3,6 +3,7 @@ package handle
 import (
 	"context"
 	"errors"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
@@ -53,7 +54,7 @@ func OrderCallbackHandle(ctx context.Context, t *asynq.Task) error {
 		return err
 	}
 	orderResp.Signature = signature
-	resp, err := client.R().SetHeader("powered-by", "Epusdt(https://github.com/assimon/epusdt)").SetBody(orderResp).Post(order.NotifyUrl)
+	resp, err := client.R().SetBody(orderResp).Post(order.NotifyUrl)
 	if err != nil {
 		return err
 	}
