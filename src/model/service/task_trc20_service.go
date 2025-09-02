@@ -2,6 +2,9 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
+
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/mq"
@@ -14,8 +17,6 @@ import (
 	"github.com/gookit/goutil/stdutil"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
-	"net/http"
-	"sync"
 )
 
 const UsdtTrc20ApiUri = "https://apilist.tronscanapi.com/api/transfer/trc20"
@@ -86,7 +87,7 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		panic(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		panic(err)
+		panic("resp.StatusCode() != http.StatusOK")
 	}
 	var trc20Resp UsdtTrc20Resp
 	err = json.Cjson.Unmarshal(resp.Body(), &trc20Resp)

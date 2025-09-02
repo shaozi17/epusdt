@@ -137,7 +137,7 @@
     <div class="site">
       Order No: {{.TradeId}}
     </div>
-    <div class="gray-text">The current USDT network is TRC20.</div>
+    <div class="gray-text" id="network-text">Detecting USDT network...</div>
     <div class="red-text">!! The amount paid should be consistent with the following amount!!</div>
     <div class="red-text">Click the wallet address or amount to copy👇</div>
     <div class="qr-code-container">
@@ -240,5 +240,13 @@
       }
     });
   }
+  document.addEventListener('DOMContentLoaded', function () {
+    var tokenEl = document.getElementById('copy-token');
+    var networkTextEl = document.getElementById('network-text');
+    var token = tokenEl ? (tokenEl.getAttribute('data-clipboard-text') || tokenEl.textContent.trim()) : '';
+    var network = 'TRC20';
+    if (token && token.toLowerCase().startsWith('0x')) network = 'ERC20';
+    if (networkTextEl) networkTextEl.textContent = 'The current USDT network is ' + network + '.';
+  });
   window.onload = checkOrderStatus();
 </script>
