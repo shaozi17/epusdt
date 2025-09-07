@@ -3,12 +3,13 @@ package data
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/assimon/luuu/model/dao"
 	"github.com/assimon/luuu/model/mdb"
 	"github.com/assimon/luuu/model/request"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -48,6 +49,7 @@ func OrderSuccessWithTransaction(tx *gorm.DB, req *request.OrderProcessingReques
 		"block_transaction_id": req.BlockTransactionId,
 		"status":               mdb.StatusPaySuccess,
 		"callback_confirm":     mdb.CallBackConfirmNo,
+		"amount":               req.Amount,
 	}).Error
 	return err
 }
@@ -106,4 +108,23 @@ func UnLockTransaction(token string, amount float64) error {
 	cacheKey := fmt.Sprintf(CacheWalletAddressWithAmountToTradeIdKey, token, amount)
 	err := dao.Rdb.Del(ctx, cacheKey).Err()
 	return err
+}
+
+// OrderUpdateTxid 事务更新交易ID
+func OrderUpdateTxid(tx *gorm.DB, req *request.OrderProcessingRequest) error {
+	err := tx.Model(&mdb.Orders{}).Where("trade_id = ?", req.TradeId).Updates(map[string]interface{}{
+		"block_transaction_id": req.BlockTransactionId,
+	}).Error
+	return err
+}
+
+// GetPendingHashOrders 获得订单正在进行中的提交过哈希值的订单
+func GetPendingHashOrders() ([]mdb.Orders, error) {
+	var orders []mdb.Orders
+
+	err := dao.Mdb.Model(orders).
+		Where("block_transaction_id != ''").
+		Where("status = ?", mdb.StatusWaitPay).
+		Find(&orders).Error
+	return orders, err
 }

@@ -22,6 +22,7 @@ import (
 const UsdtErc20ApiUri = "https://blockscout.com/eth/mainnet/api"
 const UsdtErc20ApiKey = "0135db27-4208-47b4-b757-e61030334a96"
 const UsdtErc20Contract = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+const UsdcErc20Contract = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 
 type BlockscoutResp struct {
 	Status  string      `json:"status"`
@@ -58,7 +59,7 @@ func Erc20CallBack(token string, wg *sync.WaitGroup) {
 		"module":          "account",
 		"action":          "tokentx",
 		"address":         token,
-		"contractaddress": UsdtErc20Contract,
+		"contractaddress": UsdcErc20Contract,
 		"page":            "1",
 		"offset":          "100",
 		"sort":            "desc",

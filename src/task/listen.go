@@ -6,7 +6,9 @@ func Start() {
 	c := cron.New()
 	// 汇率监听
 	c.AddJob("@every 60s", UsdtRateJob{})
-	// trc20钱包监听
+	// 监听金额订单
 	c.AddJob("@every 5s", ListenJob{})
+	// 监听用户提交了 Hash 的订单
+	c.AddJob("@every 5s", ListenHashJob{})
 	c.Start()
 }

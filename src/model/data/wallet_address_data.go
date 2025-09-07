@@ -58,7 +58,7 @@ func GetPendingWalletAddress() ([]mdb.WalletAddress, error) {
 	walletAddressTable := (&mdb.WalletAddress{}).TableName()
 
 	err := dao.Mdb.Model(WalletAddressList).
-		Where("EXISTS (SELECT 1 FROM "+ordersTable+" WHERE "+ordersTable+".token = "+walletAddressTable+".token AND "+ordersTable+".status = ?)", mdb.StatusWaitPay).
+		Where("EXISTS (SELECT 1 FROM "+ordersTable+" WHERE "+ordersTable+".token = "+walletAddressTable+".token AND "+ordersTable+".block_transaction_id = '' AND "+ordersTable+".status = ?)", mdb.StatusWaitPay).
 		Where("status = ?", mdb.TokenStatusEnable).
 		Find(&WalletAddressList).Error
 	return WalletAddressList, err

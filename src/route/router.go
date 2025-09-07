@@ -19,6 +19,8 @@ func RegisterRoute(e *echo.Echo) {
 	payRoute.GET("/checkout-counter/:trade_id", comm.Ctrl.CheckoutCounter)
 	// 状态检测
 	payRoute.GET("/check-status/:trade_id", comm.Ctrl.CheckStatus)
+	// Hash状态检测
+	payRoute.GET("/check-hash-status/:trade_id/:txHash", comm.Ctrl.CheckHashStatus)
 
 	apiV1Route := e.Group("/api/v1")
 	// ====订单相关====

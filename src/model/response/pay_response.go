@@ -12,3 +12,8 @@ type CheckStatusResponse struct {
 	TradeId string `json:"trade_id"` //  epusdt订单号
 	Status  int    `json:"status"`
 }
+type CheckHashStatusResponse struct {
+	TradeId            string `json:"trade_id"` //  epusdt订单号
+	Status             int    `json:"status"`
+	BlockTransactionId string `json:"block_transaction_id"` //  区块链交易ID
+}

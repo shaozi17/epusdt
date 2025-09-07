@@ -198,3 +198,15 @@ func GetOrderInfoByTradeId(tradeId string) (*mdb.Orders, error) {
 	}
 	return order, nil
 }
+
+// OrderUpdateTxid 通过交易号更新订单
+func OrderUpdateTxid(req *request.OrderProcessingRequest) (*mdb.Orders, error) {
+	err := data.OrderUpdateTxid(dao.Mdb, req)
+	if err != nil {
+		return nil, err
+	}
+	return &mdb.Orders{
+		TradeId:            req.TradeId,
+		BlockTransactionId: req.BlockTransactionId,
+	}, nil
+}
