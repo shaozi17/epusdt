@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>USD</title>
   <link rel="stylesheet" href="/static/reset.css" />
+  <link rel="stylesheet" href="/static/layer/layer.css">
   <style>
     /* 全局 */
     :root {
@@ -408,7 +409,7 @@
         url: "/pay/check-hash-status/{{.TradeId}}/" + document.getElementById('txid').value,
         timeout: 10000,
         success: function (response, status) {
-          layer.msg('Submit successfully, please wait...', {icon: 16, shade: 0.01, time: 20000});
+          layer.msg('Submit successfully, please wait check...');
         },
       });
     }
