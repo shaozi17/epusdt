@@ -39,7 +39,7 @@ func CreateOrderWithTransaction(tx *gorm.DB, order *mdb.Orders) error {
 // GetOrderByBlockIdWithTransaction 通过区块获取订单
 func GetOrderByBlockIdWithTransaction(tx *gorm.DB, blockId string) (*mdb.Orders, error) {
 	order := new(mdb.Orders)
-	err := tx.Model(order).Limit(1).Find(order, "block_transaction_id = ?", blockId).Error
+	err := tx.Model(order).Limit(1).Find(order, "block_transaction_id = ? and status = ?", blockId, mdb.StatusPaySuccess).Error
 	return order, err
 }
 
@@ -50,6 +50,7 @@ func OrderSuccessWithTransaction(tx *gorm.DB, req *request.OrderProcessingReques
 		"status":               mdb.StatusPaySuccess,
 		"callback_confirm":     mdb.CallBackConfirmNo,
 		"amount":               req.Amount,
+		"actual_amount":        req.Amount,
 	}).Error
 	return err
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
@@ -15,7 +16,7 @@ func GetCheckoutCounterByTradeId(tradeId string) (*response.CheckoutCounterRespo
 		return nil, err
 	}
 	if orderInfo.ID <= 0 || orderInfo.Status != mdb.StatusWaitPay {
-		return nil, errors.New("不存在待支付订单或已过期！")
+		return nil, errors.New("Timeout!")
 	}
 	resp := &response.CheckoutCounterResponse{
 		TradeId:        orderInfo.TradeId,

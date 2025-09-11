@@ -389,8 +389,8 @@
         timeout: 10000,
         success: function (response, status) {
           if (response.data.status == 2) {
-            layer.msg('Payment successful, jumping now...', {icon: 16, shade: 0.01, time: 20000});
-            window.location.href = {{.RedirectUrl}};
+            layer.msg('Payment successful', {icon: 16, shade: 0.01, time: 20000});
+            // window.location.href = {{.RedirectUrl}};
           } else {
             setTimeout("checkOrderStatus()", 2000);
           }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -35,7 +36,7 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 	defer wg.Done()
 	defer func() {
 		if err := recover(); err != nil {
-			log.Sugar.Error(err)
+			log.Sugar.Error(fmt.Sprintf("Trc20HashCallBack panic: %v, tradeId: %s", err, tradeId))
 		}
 	}()
 	client := http_client.GetHttpClient()
@@ -46,7 +47,7 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		panic(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		panic("resp.StatusCode() != http.StatusOK")
+		panic(fmt.Sprintf("http status code error: %d", resp.StatusCode()))
 	}
 	var trc20Resp UsdtTrc20HashResp
 	err = json.Cjson.Unmarshal(resp.Body(), &trc20Resp)
@@ -54,11 +55,11 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		panic(err)
 	}
 	if len(trc20Resp.Trc20TransferInfo) <= 0 || trc20Resp.ContractRet != "SUCCESS" {
-		return
+		panic("no transfer info or contractRet not success")
 	}
 	for _, transfer := range trc20Resp.Trc20TransferInfo {
-		if transfer.ToAddress != token || transfer.Symbol != "USDT" || transfer.Type != "Transfer" || transfer.TokenType != "trc20" {
-			continue
+		if transfer.ToAddress != token || transfer.Symbol != "USDT" || transfer.Type != "Transfer" {
+			panic(fmt.Sprintf("transfer info not match, trade: %s", transfer))
 		}
 		decimalQuant, err := decimal.NewFromString(transfer.AmountStr)
 		if err != nil {
@@ -66,13 +67,6 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		}
 		decimalDivisor := decimal.NewFromFloat(1000000)
 		amount := decimalQuant.Div(decimalDivisor).InexactFloat64()
-		// tradeId, err := data.GetTradeIdByWalletAddressAndAmount(token, amount)
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// if tradeId == "" {
-		// 	continue
-		// }
 		order, err := data.GetOrderInfoByTradeId(tradeId)
 		if err != nil {
 			panic(err)
@@ -93,6 +87,7 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		if err != nil {
 			panic(err)
 		}
+		log.Sugar.Info(fmt.Sprintf("Trc20HashCallBack success: tradeId: %s, token: %s, hashId: %s, amount: %f", tradeId, token, hashId, amount))
 		// 回调队列
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
 		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
