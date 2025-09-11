@@ -49,8 +49,8 @@ func OrderSuccessWithTransaction(tx *gorm.DB, req *request.OrderProcessingReques
 		"block_transaction_id": req.BlockTransactionId,
 		"status":               mdb.StatusPaySuccess,
 		"callback_confirm":     mdb.CallBackConfirmNo,
-		"amount":               req.Amount,
-		"actual_amount":        req.Amount,
+		// "amount":               req.Amount,
+		"actual_amount": req.Amount,
 	}).Error
 	return err
 }

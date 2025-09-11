@@ -179,9 +179,8 @@ func Erc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		panic(err)
 	}
 
-	order.Amount = req.Amount
 	order.ActualAmount = req.Amount
-	log.Sugar.Info(fmt.Sprintf("Erc20HashCallBack success: tradeId: %s, token: %s, hashId: %s, amount: %f", tradeId, token, hashId, amount))
+	log.Sugar.Info(fmt.Sprintf("Erc20HashCallBack success: tradeId: %s, token: %s, hashId: %s, actual_amount: %f", tradeId, token, hashId, order.ActualAmount))
 
 	// 回调队列
 	orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
