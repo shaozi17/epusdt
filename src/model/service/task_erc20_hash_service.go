@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"net/http"
@@ -48,7 +49,7 @@ func Erc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 	defer wg.Done()
 	defer func() {
 		if err := recover(); err != nil {
-			log.Sugar.Error(err)
+			log.Sugar.Error(fmt.Sprintf("Erc20HashCallBack panic: %v, tradeId: %s", err, tradeId))
 		}
 	}()
 	client := http_client.GetHttpClient()
@@ -73,15 +74,14 @@ func Erc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		panic(err)
 	}
 	if bsResp.Status != "1" {
-		// 没有结果或查询失败，直接返回
-		return
+		panic("bsResp.Status != 1")
 	}
 
 	t := bsResp.Result
 
 	// 只监控 USDT 和 USDC
 	if strings.ToLower(t.To) != strings.ToLower(UsdtErc20Contract) && strings.ToLower(t.To) != strings.ToLower(UsdcErc20Contract) {
-		return
+		panic("not usdt or usdc contract")
 	}
 	// 获取 USD 金额 & 对比收款地址
 	amount := 0.0
@@ -178,6 +178,10 @@ func Erc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 	if err != nil {
 		panic(err)
 	}
+
+	order.Amount = req.Amount
+	order.ActualAmount = req.Amount
+	log.Sugar.Info(fmt.Sprintf("Erc20HashCallBack success: tradeId: %s, token: %s, hashId: %s, amount: %f", tradeId, token, hashId, amount))
 
 	// 回调队列
 	orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)

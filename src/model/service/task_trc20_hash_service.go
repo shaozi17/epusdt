@@ -87,6 +87,9 @@ func Trc20HashCallBack(tradeId string, token string, hashId string, wg *sync.Wai
 		if err != nil {
 			panic(err)
 		}
+		order.Amount = req.Amount
+		order.ActualAmount = req.Amount
+
 		log.Sugar.Info(fmt.Sprintf("Trc20HashCallBack success: tradeId: %s, token: %s, hashId: %s, amount: %f", tradeId, token, hashId, amount))
 		// 回调队列
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
