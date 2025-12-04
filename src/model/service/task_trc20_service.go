@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/assimon/luuu/model/data"
+	"github.com/assimon/luuu/model/mdb"
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/mq"
 	"github.com/assimon/luuu/mq/handle"
@@ -134,6 +135,8 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		if err != nil {
 			panic(err)
 		}
+		// 订单状态改为成功
+		order.Status = mdb.StatusPaySuccess
 		// 回调队列
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
 		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))

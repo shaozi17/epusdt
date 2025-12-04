@@ -47,7 +47,7 @@ func OrderCallbackHandle(ctx context.Context, t *asynq.Task) error {
 		ActualAmount:       order.ActualAmount,
 		Token:              order.Token,
 		BlockTransactionId: order.BlockTransactionId,
-		Status:             mdb.StatusPaySuccess,
+		Status:             order.Status,
 	}
 	signature, err := sign.Get(orderResp, config.GetApiAuthToken())
 	if err != nil {
@@ -59,10 +59,13 @@ func OrderCallbackHandle(ctx context.Context, t *asynq.Task) error {
 		return err
 	}
 	body := string(resp.Body())
-	if body != "ok" {
-		order.CallBackConfirm = mdb.CallBackConfirmNo
-		return errors.New("not ok")
+	//区别处理回调结果 如果是修改hash值的回调 则不做确认处理
+	if order.Status == mdb.StatusPaySuccess {
+		if body != "ok" {
+			order.CallBackConfirm = mdb.CallBackConfirmNo
+			return errors.New("not ok")
+		}
+		order.CallBackConfirm = mdb.CallBackConfirmOk
 	}
-	order.CallBackConfirm = mdb.CallBackConfirmOk
 	return nil
 }

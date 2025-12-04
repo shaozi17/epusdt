@@ -9,6 +9,9 @@ import (
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/model/response"
 	"github.com/assimon/luuu/model/service"
+	"github.com/assimon/luuu/mq"
+	"github.com/assimon/luuu/mq/handle"
+	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 )
 
@@ -59,5 +62,9 @@ func (c *BaseCommController) CheckHashStatus(ctx echo.Context) (err error) {
 		Status:             order.Status,
 		BlockTransactionId: order.BlockTransactionId,
 	}
+
+	// 回调队列 更新交易哈希
+	orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
+	mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
 	return c.SucJson(ctx, resp)
 }
