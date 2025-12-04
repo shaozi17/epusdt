@@ -26,19 +26,26 @@ func NewOrderCallbackQueue(order *mdb.Orders) (*asynq.Task, error) {
 }
 
 func OrderCallbackHandle(ctx context.Context, t *asynq.Task) error {
-	var order mdb.Orders
-	err := json.Cjson.Unmarshal(t.Payload(), &order)
+	var orderReq mdb.Orders
+	err := json.Cjson.Unmarshal(t.Payload(), &orderReq)
 	if err != nil {
 		return err
 	}
+
+	order, err := data.GetOrderInfoByTradeId(orderReq.TradeId)
+	if err != nil {
+		return err
+	}
+
 	defer func() {
 		if err := recover(); err != nil {
 			log.Sugar.Error(err)
 		}
 	}()
 	defer func() {
-		data.SaveCallBackOrdersResp(&order)
+		data.SaveCallBackOrdersResp(order)
 	}()
+
 	client := http_client.GetHttpClient()
 	orderResp := response.OrderNotifyResponse{
 		TradeId:            order.TradeId,
